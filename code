@@ -432,7 +432,7 @@ function formatMmk(multiKillsValue){
     if(command === 'bp') {
       let getBp = async () => {
         let response = await axios.get(
-          'http://parsers.azurewebsites.net/api/v1/requests/0ec33597-9d89-4039-b981-18b5ae699247/results?fileFormat=json&iteration=0'
+          ''
           );  
         let bestpistol = response.data;
         return bestpistol;
@@ -564,7 +564,7 @@ function formatMmk(multiKillsValue){
 if(command === 'stats') {
   let getoliqq = async () => {
     let response = await axios.get(
-      `https://simplescraper.io/api/kMRN56wMElvza7Q6HKc7?apikey=9JJBkPmkpej1ayAB8qbNa6d5VqFkRPil&limit=20&source_url=https://stats.takepoint.io/user/${args}&run_now=true`
+      ``
       );  
     let oliqq = response.data;
     return oliqq;
@@ -574,7 +574,7 @@ if(command === 'stats') {
 const PlayerEmbed = new Discord.MessageEmbed()
 .setColor(15844367)
 .setDescription(formatPlayer(oliqqValue))
-.addField("Subscribe to Nitrogem35", "[View these stats online](https://stats.takepoint.io/)")
+.addField("Subscribe to Nitrogem35", `[View these stats online](https://stats.takepoint.io/${args})`)
 message.channel.send(
 PlayerEmbed
 ) 
