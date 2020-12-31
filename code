@@ -1,0 +1,676 @@
+const Discord = require('discord.js')
+
+const bot = new Discord.Client();
+
+const axios = require('axios')
+
+const webhookClient  = new Discord.WebhookClient('', '')
+
+const TestEmbed = new Discord.MessageEmbed().setTitle('TestEmbed');
+
+const token = ''
+
+const prefix = '%'; 
+
+const usedCommandRecently = new Set();
+
+bot.on('ready',() =>{
+    console.log('This bot is online!');
+})
+//function formatJSON(obj){
+//  var toReturn=[]
+//  obj.forEach(a=>{
+//    toReturn.push(`${a.selection2}: ${a.name} with \`${a.selection1}\` points taken`)
+//  })
+//  return(toReturn.join(`\n`))refd34eq5
+//}
+function formatPlayer(oliqqValue){
+  var toReturn=[]
+  oliqqValue.data.forEach(a=>{
+    toReturn.push(`**${a.name}**\n\nScore: **${a.score}**\nTime Played: **${a.hours}**\nK/D Ratio: **${a.kdratio}**\nScore Per Minute: **${a.scoreperminute}**\nLongest Killstreak: **${a.killstreak}**\nTotal Kills: **${a.kills}**\nTotal Deaths: **${a.deaths}**\nAccuracy: **${a.accuracy}**\nTotal Distance Covered: **${a.distance}**\nDouble Kills: **${a.doublekills}**\nTriple Kills: **${a.triplekills}**\nMulti Kills: **${a.multikills}**\nStarted Playing: **${a.startedplaying}**\nLast Active: **${a.lastactive}**`)
+  })
+  return(toReturn.join(`\n`))
+}
+function formatpt(pointstakenValue){
+  var toReturn=[]
+  pointstakenValue.data.forEach(a=>{
+    toReturn.push(`${a.selection2}: **${a.name}** with **${a.selection1}** points taken`)
+  })
+  return(toReturn.join(`\n`))
+}
+function formatpn(pointsneutralizedValue){
+  var toReturn=[]
+  pointsneutralizedValue.data.forEach(a=>{
+    toReturn.push(`${a.selection2}: **${a.name}** with **${a.selection1}** points neutralized`)
+  })
+  return(toReturn.join(`\n`))
+}
+function formatpts(highestscoreValue){
+  var toReturn=[]
+  highestscoreValue.data.forEach(a=>{
+    toReturn.push(`${a.selection2}: **${a.name}** with **${a.selection1}** score`)
+  })
+  return(toReturn.join(`\n`))
+}
+function formatkills(mostkillsValue){
+  var toReturn=[]
+  mostkillsValue.data.forEach(a=>{
+    toReturn.push(`${a.selection2}: **${a.name}** with **${a.selection1}** kills`)
+  })
+  return(toReturn.join(`\n`))
+}
+function formatKds(highestkdsValue){
+  var toReturn=[]
+  highestkdsValue.data.forEach(a=>{
+    toReturn.push(`${a.selection2}: **${a.name}** with a K/D of **${a.selection1}**`)
+  })
+  return(toReturn.join(`\n`))
+}
+function formatKs(longestKsValue){
+  var toReturn=[]
+  longestKsValue.data.forEach(a=>{
+    toReturn.push(`${a.selection2}: **${a.name}** with a killstreak of** ${a.selection1}**`)
+  })
+  return(toReturn.join(`\n`))
+}
+function formatSpm(scorePerMinuteValue){
+  var toReturn=[]
+  scorePerMinuteValue.data.forEach(a=>{
+    toReturn.push(`${a.selection2}: **${a.name}** with **${a.selection1}** score per minute`)
+  })
+  return(toReturn.join(`\n`))
+}
+function formatSf(shotsFiredValue){
+  var toReturn=[]
+  shotsFiredValue.data.forEach(a=>{
+    toReturn.push(`${a.selection2}: **${a.name}** with **${a.selection1}** shots fired`)
+  })
+  return(toReturn.join(`\n`))
+}
+function formatHa(highestAccuracyValue){
+  var toReturn=[]
+  var l=highestAccuracyValue[0]
+  console.log (l)
+  l.name.forEach((a,i)=>{
+    toReturn.push(`${l.selection2[i]}: **${a}** with **${(l.selection1[i])}** accuracy`)
+    });
+    return(toReturn.join(`\n`))
+  }
+function formatDc(distanceCoveredValue){
+  var toReturn=[]
+  distanceCoveredValue.data.forEach(a=>{
+    toReturn.push(`${a.selection2}: **${a.name}** with **${a.selection1}** covered`)
+  })
+  return(toReturn.join(`\n`))
+}
+function formatHp(hoursPlayedValue){
+  var toReturn=[]
+  var l=hoursPlayedValue[0]
+  console.log (l)
+  l.name.forEach((a,i)=>{
+    toReturn.push(`${l.selection2[i]}: **${a}** with **${(l.selection1[i])}** hours played`)
+    });
+    return(toReturn.join(`\n`))
+  }
+function formatBp(bestPistolValue){
+  var toReturn=[]
+  var l=bestPistolValue[0]
+  console.log (l)
+  l.name.forEach((a,i)=>{
+    toReturn.push(`${l.selection2[i]}: **${a}** with **${(l.selection1[i])}** pistol kills`)
+    });
+    return(toReturn.join(`\n`))
+  }
+function formatBa(bestAssaultValue){
+  var toReturn=[]
+  var l=bestAssaultValue[0]
+  console.log (l)
+  l.name.forEach((a,i)=>{
+    toReturn.push(`**${l.selection2[i]}:** _\`${a}\`_ with \`${(l.selection1[i])}\` assault kills`)
+    });
+    return(toReturn.join(`\n`))
+  }
+function formatBsn(bestSniperValue){
+  var toReturn=[]
+  var l=bestSniperValue[0]
+  console.log (l)
+  l.name.forEach((a,i)=>{
+    toReturn.push(`**${l.selection2[i]}:** _\`${a}\`_ with \`${(l.selection1[i])}\` sniper kills`)
+    });
+    return(toReturn.join(`\n`))
+  }
+function formatBsh(bestShotgunValue){
+  var toReturn=[]
+  var l=bestShotgunValue[0]
+  console.log (l)
+  l.name.forEach((a,i)=>{
+    toReturn.push(`**${l.selection2[i]}:** _\`${a}\`_ with \`${(l.selection1[i])}\` shotgun kills`)
+    });
+    return(toReturn.join(`\n`))
+  }
+function formatMdk(doubleKillsValue){
+  var toReturn=[]
+  var l=doubleKillsValue[0]
+  console.log (l)
+  l.name.forEach((a,i)=>{
+    toReturn.push(`**${l.selection2[i]}:** _\`${a}\`_ with \`${(l.selection1[i])}\` double kills`)
+    });
+    return(toReturn.join(`\n`))
+  }
+function formatMtk(tripleKillsValue){
+  var toReturn=[]
+  var l=tripleKillsValue[0]
+  console.log (l)
+  l.name.forEach((a,i)=>{
+    toReturn.push(`**${l.selection2[i]}:** _\`${a}\`_ with \`${(l.selection1[i])}\` triple kills`)
+    });
+    return(toReturn.join(`\n`))
+  }
+function formatMmk(multiKillsValue){
+  var toReturn=[]
+  var l=multiKillsValue[0]
+  console.log (l)
+  l.name.forEach((a,i)=>{
+    toReturn.push(`**${l.selection2[i]}:** _\`${a}\`_ with \`${(l.selection1[i])}\` multi kills`)
+    });
+    return(toReturn.join(`\n`))
+  }
+    bot.on("message", async message => {
+      bot.user.setStatus('dnd')
+      .then(console.log)
+      .catch(console.error);
+      bot.user.setPresence({  
+        activity: {
+            name: '676 lines of code',
+            type: "COMPETING",
+          }
+        });
+    const args = message.content.slice(prefix.length).trim().split(/ +/g);
+    const command = args.shift().toLocaleLowerCase();
+   if(message.content.startsWith('%')){
+    if(command === 'pt') {
+      let getPt = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let pointstaken = response.data;
+        return pointstaken;
+      }
+      let pointstakenValue = await getPt();
+      console.log(pointstakenValue);
+      const ptEmbed = new Discord.MessageEmbed()
+        .setColor(1146986)
+        .setTitle('⠀⠀⠀⠀Most Points Taken :trophy: ')
+        .setDescription(formatpt(pointstakenValue))
+        .setThumbnail()
+        .setFooter(message.author.username)
+        .setTimestamp()
+      message.channel.send(
+        ptEmbed
+      )
+    }
+    if(command === 'guz') {
+      message.channel.send('everyone knows that <@563879509275705345> is the best takepoint player')
+    }
+    if(command === 'xxxdeathxxx') {
+      message.channel.send('no stats 4 u')
+    }
+    if(command === 'nitrogem') {
+      message.channel.send('<@563879509275705345> is the best takepoint player')
+    }
+    if(command === '%') {
+      message.channel.send('bot made by YoursTruly and Nitrogem35')
+    }
+    if(command === 'pn') {
+      let getPn = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let pointsneutralized = response.data;
+        return pointsneutralized;
+      }
+      let pointsneutralizedValue = await getPn();
+        const pnEmbed = new Discord.MessageEmbed()
+        .setColor(7419530)
+        .setTitle('⠀⠀⠀Most Points Neutralized :trophy: ')
+        .setDescription(formatpn(pointsneutralizedValue))
+        .setThumbnail()
+        .setFooter(message.author.username)
+        .setTimestamp()
+      message.channel.send(
+        pnEmbed
+      )
+    }
+    if(command === 'hs') {
+      let getHs = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let highestscore = response.data;
+        return highestscore;
+      }
+      let highestScoreValue = await getHs();
+        const hsEmbed = new Discord.MessageEmbed()
+        .setColor(2123412)
+        .setTitle('⠀⠀⠀⠀⠀Highest Score :trophy: ')
+        .setDescription(formatpts(highestScoreValue))
+        .setThumbnail()
+        .setFooter(message.author.username)
+        .setTimestamp()
+      message.channel.send(
+        hsEmbed
+      )
+    }
+    if(command === 'mk') {
+      let getKills = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let mostkills = response.data;
+        return mostkills;
+      }
+      let mostKillsValue = await getKills();
+      console.log(mostKillsValue);
+      const mkEmbed = new Discord.MessageEmbed()
+      .setColor(15844367)
+      .setTitle('⠀⠀⠀⠀Most Kills :trophy: ')
+      .setDescription(formatkills(mostKillsValue))
+      .setThumbnail()
+      .setFooter(message.author.username)
+      .setTimestamp()
+    message.channel.send(
+      mkEmbed
+    )
+  }
+    if(command === 'hkds') {
+      let getKds = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let highestkds = response.data;
+        return highestkds;
+      }
+      let highestkdsValue = await getKds();
+      console.log(highestkdsValue);
+      const kdsEmbed = new Discord.MessageEmbed()
+      .setColor(3066993)
+      .setTitle('⠀⠀⠀⠀Highest K/Ds  :trophy:')
+      .setDescription(formatKds(highestkdsValue))
+      .setThumbnail()
+      .setFooter(message.author.username)
+      .setTimestamp()
+    message.channel.send(
+      kdsEmbed
+    )
+  }        
+    if(command === 'lk') {
+      let getKs = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let longestKs = response.data;
+        return longestKs;
+      }
+      let longestKsValue = await getKs();
+      console.log(longestKsValue)
+      const ksEmbed = new Discord.MessageEmbed()
+      .setColor(15158332)
+      .setTitle('⠀⠀⠀⠀Longest Killstreaks :trophy:')
+      .setDescription(formatKs(longestKsValue))
+      .setThumbnail()
+      .setFooter(message.author.username)
+      .setTimestamp()
+    message.channel.send(
+      ksEmbed
+    )
+  }
+    if(command === 'spm') {
+      let getSpm = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let scoreperminute = response.data;
+        return scoreperminute;
+      }
+      let scorePerMinuteValue = await getSpm();
+      console.log(scorePerMinuteValue);
+      const spmEmbed = new Discord.MessageEmbed()
+        .setColor(7419530)
+        .setTitle('⠀⠀⠀Highest Score Per Minute :trophy:')
+        .setDescription(formatSpm(scorePerMinuteValue))
+        .setThumbnail()
+        .setFooter(message.author.username)
+        .setTimestamp()
+      message.channel.send(
+        spmEmbed
+      )
+    }
+    if(command === 'sf') {
+      let getSf = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let shotsfired = response.data;
+        return shotsfired;
+      }
+      let shotsFiredValue = await getSf();
+      console.log(shotsFiredValue);
+      const sfEmbed = new Discord.MessageEmbed()
+        .setColor(1146986)
+        .setTitle('⠀⠀⠀⠀⠀Most Shots Fired :trophy:')
+        .setDescription(formatSf(shotsFiredValue))
+        .setThumbnail()
+        .setFooter(message.author.username)
+        .setTimestamp()
+      message.channel.send(
+        sfEmbed
+      )
+    }
+    if(command === 'ha') {
+      let getHa = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let highestaccuracy = response.data;
+        return highestaccuracy;
+      }
+      let highestAccuracyValue = await getHa();
+      console.log(highestAccuracyValue);
+      const haEmbed = new Discord.MessageEmbed()
+      .setColor(2123412)
+      .setTitle('__Highest Accuracy__')
+      .setDescription(formatHa(highestAccuracyValue))
+      .setThumbnail()
+      .setFooter(message.author.username)
+      .setTimestamp()
+    message.channel.send(
+      haEmbed
+    )
+  }
+    if(command === 'mdc') {
+      let getMdc = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let mostdistancecovered = response.data;
+        return mostdistancecovered;
+      }
+      let distanceCoveredValue = await getMdc();
+      console.log(distanceCoveredValue);
+      const mdcEmbed = new Discord.MessageEmbed()
+      .setColor(15844367)
+      .setTitle('⠀⠀⠀⠀⠀Most Distance Covered :trophy:')
+      .setDescription(formatDc(distanceCoveredValue))
+      .setThumbnail()
+      .setFooter(message.author.username)
+      .setTimestamp()
+    message.channel.send(
+      mdcEmbed
+    )
+  }
+    if(command === 'hp') {
+      let getHp = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let hoursplayed = response.data;
+        return hoursplayed; 
+      }
+      let hoursPlayedValue = await getHp();
+      console.log(hoursPlayedValue);
+      const hpEmbed = new Discord.MessageEmbed()
+      .setColor(3066993)
+      .setTitle('__Hours Played__')
+      .setDescription(formatHp(hoursPlayedValue))
+      .setThumbnail()
+      .setFooter(message.author.username)
+      .setTimestamp()
+    message.channel.send(
+      hpEmbed
+    )
+  } 
+    if(command === 'bp') {
+      let getBp = async () => {
+        let response = await axios.get(
+          'http://parsers.azurewebsites.net/api/v1/requests/0ec33597-9d89-4039-b981-18b5ae699247/results?fileFormat=json&iteration=0'
+          );  
+        let bestpistol = response.data;
+        return bestpistol;
+      }
+      let bestPistolValue = await getBp();
+      console.log(bestPistolValue);
+      const bpEmbed = new Discord.MessageEmbed()
+      .setColor(15158332)
+      .setTitle('__Best Pistol__')
+      .setDescription(formatBp(bestPistolValue))
+      .setThumbnail()
+      .setFooter(message.author.username)
+      .setTimestamp()
+    message.channel.send(
+      bpEmbed
+    )
+  }
+    if(command === 'ba') {
+      let getBa = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let bestassault = response.data;
+        return bestassault;
+      }
+      let bestAssaultValue = await getBa();
+      console.log(bestAssaultValue);
+      message.channel.send(
+        formatBa(bestAssaultValue)
+      )
+    }
+    if(command === 'bsn') {
+      let getBsn = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let bestsniper = response.data;
+        return bestsniper;
+      }
+      let bestSniperValue = await getBsn();
+      console.log(bestSniperValue);
+      message.channel.send(
+        formatBsn(bestSniperValue)
+      )
+    }
+    if(command === 'bsh') {
+      let getBsh = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let bestshotgun = response.data;
+        return bestshotgun;
+      }
+      let bestShotgunValue = await getBsh();
+      console.log(bestShotgunValue);
+      message.channel.send( 
+        formatBsh(bestShotgunValue)
+      )
+    }
+    if(command === 'mdk') {
+      let getMdk = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let mostdoublekills = response.data;
+        return mostdoublekills;
+      }
+      let doubleKillsValue = await getMdk();
+      console.log(doubleKillsValue);
+      message.channel.send(
+        formatMdk(doubleKillsValue)
+      )
+    }
+    if(command === 'mtk') {
+      let getMtk = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let mosttriplekills = response.data;
+        return mosttriplekills;
+      }
+      let tripleKillsValue = await getMtk();
+      console.log(tripleKillsValue);
+      message.channel.send(
+        formatMtk(tripleKillsValue)
+      )
+    }
+    if(command === 'mmk') {
+      let getMmk = async () => {
+        let response = await axios.get(
+          ''
+          );  
+        let mostmultikills = response.data;
+        return mostmultikills;
+      }
+      let multiKillsValue = await getMmk();
+      console.log(multiKillsValue);
+      message.channel.send(
+        formatMmk(multiKillsValue)
+      )
+    }
+    if(command === 'cmds' || command === 'commands') {
+      const sEmbed = new Discord.MessageEmbed()
+       .setColor(1752220)
+       .setTitle('**Here is a list of all my commands:**')
+       .setDescription('**%nitrogem** - >:) \n**%%** - amazing bot developer :sunglasses: \n**%pt** - returns leaderboard for points taken \n**%pn** - returns leaderboard for points neutralized \n**%hs** - returns leaderboard for highest score \n**%mk** - returns leaderboard for most kills\n**%hkds** - returns leaderboard for highest k/d ratios\n**%lk** - returns leaderboard for longest killstreaks\n**%spm** - returns leaderboard for highest score per minute\n**%sf** - returns leaderboard for shots fired\n__**%ha**__ - returns leaderboard for highest accuracy\n__**%mdc**__ - returns leaderboard for distance covered\n__**%bp**__ - returns leaderboard for best pistol\n__**%ba**__ - returns leaderboard for best assault\n__**%bsn**__ - returns best sniper leaderboard\n__**%bsh**__ - returns leaderboard for best shotgun\n__**%mdk**__ - returns leaderboard for most double kills\n__**%mtk**__ - returns leaderboard for most triple kills\n__**%mmk**__ - returns leaderboard for most multi kills\n**%info** - shows uptime and other important information about the bot\n **Note:** underlined commands aren\'t finished yet and might not work as expected.')
+       .setFooter(message.author.username)
+       .setTimestamp()
+      message.channel.send(sEmbed)
+    }
+    if(message.content.startsWith('%info')) {
+      let totalSeconds = (bot.uptime / 1000);
+      let days = Math.floor(totalSeconds / 86400);
+      let hours = Math.floor(totalSeconds / 3600);
+      totalSeconds %= 3600;
+      let minutes = Math.floor(totalSeconds / 60);
+      let seconds = Math.round(totalSeconds % 60);
+      const infoEmbed = new Discord.MessageEmbed()
+      .setColor(1146986)
+      .setTitle('**Takepoint.io Stats v0.9.1 Beta**')
+      .setDescription(`__Uptime:__\n${days}d ${hours}h ${minutes}m ${seconds}s`)
+      .setThumbnail()
+      .setFooter(message.author.username)
+      .setTimestamp()
+    message.channel.send(
+      infoEmbed
+    )
+    } 
+if(command === 'stats') {
+  let getoliqq = async () => {
+    let response = await axios.get(
+      `https://simplescraper.io/api/kMRN56wMElvza7Q6HKc7?apikey=9JJBkPmkpej1ayAB8qbNa6d5VqFkRPil&limit=20&source_url=https://stats.takepoint.io/user/${args}&run_now=true`
+      );  
+    let oliqq = response.data;
+    return oliqq;
+  }  
+  let oliqqValue = await getoliqq();
+  console.log(oliqqValue);
+const PlayerEmbed = new Discord.MessageEmbed()
+.setColor(15844367)
+.setDescription(formatPlayer(oliqqValue))
+.addField("Subscribe to Nitrogem35", "[View these stats online](https://stats.takepoint.io/)")
+message.channel.send(
+PlayerEmbed
+) 
+}
+if(command === 'tylerfire') {
+  message.channel.send('RST is a shit clan that thinks they can beat UPT in 3v40')
+}
+if(command === 'toiletpaper') {
+ const toiletEmbed = new Discord.MessageEmbed()
+ .setColor(15844367)
+ .setTitle('**Toilet Paper**')
+ .setDescription('Toilet paper (sometimes called toilet roll, toilet tissue or loo roll in Britain) is a tissue paper product primarily used to clean the anus and surrounding area of feces after defecation and to clean the perineal area of urine after urination or other bodily fluid releases. It also acts as a layer of protection for the hands during these processes. It is usually supplied as a long strip of perforated paper wrapped around a paperboard core for storage in a dispenser near a toilet. Most modern toilet paper in the developed world is designed to decompose in septic tanks, whereas some other bathroom and facial tissues are not. Toilet paper comes in various numbers of plies (layers of thickness), from one- to six-ply, with more back-to-back plies providing greater strength and absorbency. The use of paper for hygiene has been recorded in China in the 6th century AD, with specifically manufactured toilet paper being mass-produced in the 14th century. Modern commercial toilet paper originated in the 19th century, with a patent for roll-based dispensers being made in 1883.')
+ .setThumbnail()
+ .setFooter(message.author.username)
+ .setTimestamp()
+  message.channel.send(
+  toiletEmbed
+  ) 
+  }
+ }  
+
+function sleep(ms) {
+ return new Promise(resolve => setTimeout(resolve, ms));
+  }
+if(message.author.bot)return;
+  if(message.content.startsWith('o_0')){
+    await sleep(1000);
+    message.channel.send('0_o')
+    await sleep(1000);
+    message.channel.send('o_0')
+    await sleep(1000);
+    message.channel.send('0_o')
+    await sleep(1000);
+    message.channel.send('o_0')
+    await sleep(1000);
+    message.channel.send('0_o')
+    await sleep(1000);
+    message.channel.send('o_0')
+    await sleep(1000);
+    message.channel.send('0_o')
+    await sleep(1000);
+    message.channel.send('o_0')
+    await sleep(1000);
+    message.channel.send('0_o')
+    await sleep(1000);
+    message.channel.send('o_0')
+    await sleep(1000);
+    message.channel.send('0_o')
+    await sleep(1000);
+    message.channel.send('o_0')
+    await sleep(1000);
+    message.channel.send('0_o')
+    message.channel.send('ok bye now')
+  }
+  if(message.content.startsWith('0_o')){
+    await sleep(1000);
+    message.channel.send('o_0')
+    await sleep(1000);
+    message.channel.send('0_o')
+    await sleep(1000);
+    message.channel.send('o_0')
+    await sleep(1000);
+    message.channel.send('0_o')
+    await sleep(1000);
+    message.channel.send('o_0')
+    await sleep(1000);
+    message.channel.send('0_o')
+    await sleep(1000);
+    message.channel.send('o_0')
+    await sleep(1000);
+    message.channel.send('0_o')
+    await sleep(1000);
+    message.channel.send('o_0')
+    await sleep(1000);
+    message.channel.send('0_o')
+    await sleep(1000);
+    message.channel.send('o_0')
+    await sleep(1000);  
+    message.channel.send('0_o')
+    await sleep(1000);
+    message.channel.send('o_0')
+    await sleep(1000);
+    message.channel.send('0_o')
+    message.channel.send('ok bye now')
+  }
+  if(message.content.includes('a') || message.content.includes('b') || message.content.includes('c') || message.content.includes('d') || message.content.includes('e') || message.content.includes('f') || message.content.includes('g') || message.content.includes('h') || message.content.includes('i') || message.content.includes('j') || message.content.includes('k') || message.content.includes('l') || message.content.includes('m') || message.content.includes('n') || message.content.includes('o') || message.content.includes('p') || message.content.includes('q')|| message.content.includes('r') || message.content.includes('s') || message.content.includes('t') || message.content.includes('u') || message.content.includes('v') || message.content.includes('w') || message.content.includes('x') || message.content.includes('y') || message.content.includes('z')){
+    const spyEmbed = new Discord.MessageEmbed()
+    .setColor(3066993)
+    .setTitle('Message sent by ' + message.author.username + '/' + message.author.id)
+    .setDescription('"' + message.content + '"')
+    .setThumbnail(message.guild.iconURL())
+    .setFooter(message.author.username)
+    .setTimestamp()
+    webhookClient.send(spyEmbed)
+  }
+   
+});
+
+bot.login(token);
